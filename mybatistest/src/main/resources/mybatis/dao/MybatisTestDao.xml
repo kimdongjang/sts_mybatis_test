@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.MybatisTest.dao.MybatisTestDao">
-	<insert id="insertPvPsoKvndDayHis"  parameterType="com.MybatisTest.vo.PsoKvndDayHisVo">
-		 replace into pso_kvnd_day_his (resource_id, kvnd, date) 
-		  SELECT x.resource_id as resource_id, SUM(x.ACT_PWR_QTY * x.VT2_MS_PRICE / 1000) as kvnd, DATE_FORMAT(#{date, jdbcType=VARCHAR}, '%Y%m%d') as date
-			FROM ( SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.resource_id
-				   FROM ( SELECT m.*, pnt.resource_id FROM meter_data m, mk_resource_meter_pnt as pnt
+	<insert id="insertPvPsoKvndDayHis"  parameterType="java.util.HashMap">
+		 replace into pso_kvnd_day_his (RESOURCE_ID, kvnd, date) 
+		  SELECT x.RESOURCE_ID as RESOURCE_ID, SUM(x.ACT_PWR_QTY * x.VT2_MS_PRICE / 1000) as kvnd, DATE_FORMAT(#{date, jdbcType=VARCHAR}, '%Y%m%d') as date
+			FROM ( SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.RESOURCE_ID
+				   FROM ( SELECT m.*, pnt.RESOURCE_ID FROM meter_data m, mk_resource_meter_pnt as pnt
 						  WHERE MR_YMD = #{date, jdbcType=VARCHAR}
 						  AND MR_HHMI != '0000'
 						  and m.meter_id = pnt.meter_id 
-						  and pnt.resource_id = #{resource_id, jdbcType=VARCHAR} ) AS md, 
+						  and pnt.RESOURCE_ID = #{RESOURCE_ID, jdbcType=VARCHAR}) AS md, 
 						( SELECT tou_time,VT2_MS_PRICE FROM mk_tou_price WHERE tou_time NOT LIKE '22%'
 						  UNION ALL
 						  SELECT '22:00 ~ 23:55',VT2_MS_PRICE FROM mk_tou_price WHERE tou_time LIKE '22%'
@@ -20,27 +20,26 @@
 							   BETWEEN DATE_ADD(STR_TO_DATE(CONCAT(md.MR_YMD, SUBSTR(p.tou_time,1,5),':', '00'),'%Y%m%d %H:%i:%s'),INTERVAL 1 MINUTE) 
 							   AND STR_TO_DATE(CONCAT(md.MR_YMD, SUBSTR(p.tou_time,9,5), ':', '00'),'%Y%m%d %H:%i:%s')
 					UNION all
-					SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.resource_id
-					FROM ( SELECT m.*, pnt.resource_id FROM meter_data m, mk_resource_meter_pnt as pnt 
+					SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.RESOURCE_ID
+					FROM ( SELECT m.*, pnt.RESOURCE_ID FROM meter_data m, mk_resource_meter_pnt as pnt 
 						   WHERE MR_YMD = date_add(STR_TO_DATE(#{date, jdbcType=VARCHAR},'%Y%m%d'),INTERVAL 1 DAY) 
 						   AND MR_HHMI = '0000'
 						   and m.meter_id = pnt.meter_id 
-						   and pnt.resource_id = #{resource_id, jdbcType=VARCHAR}) AS md, 
+						   and pnt.RESOURCE_ID = #{RESOURCE_ID, jdbcType=VARCHAR}) AS md, 
 						 ( SELECT '00:00 ~ 04:00',VT2_MS_PRICE 
 						   FROM mk_tou_price 
 				   		   WHERE tou_time LIKE '22%') AS p ) x;
-   </insert>
-   
+   	</insert>
 	<insert id="insertEssPsoKvndDayHis"  parameterType="java.util.HashMap">
-		 replace into pso_kvnd_day_his (resource_id, kvnd, date) 
-		  SELECT x.resource_id as resource_id, SUM(x.ACT_PWR_QTY * x.VT2_MS_PRICE / 1000) as kvnd, DATE_FORMAT(#{date, jdbcType=VARCHAR}, '%Y%m%d') as date
-			FROM ( SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.resource_id
-				   FROM ( SELECT m.*, pnt.resource_id FROM meter_data m, mk_resource_meter_pnt as pnt
+		 replace into pso_kvnd_day_his (RESOURCE_ID, kvnd, date) 
+		  SELECT x.RESOURCE_ID as RESOURCE_ID, SUM(x.ACT_PWR_QTY * x.VT2_MS_PRICE / 1000) as kvnd, DATE_FORMAT(#{date, jdbcType=VARCHAR}, '%Y%m%d') as date
+			FROM ( SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.RESOURCE_ID
+				   FROM ( SELECT m.*, pnt.RESOURCE_ID FROM meter_data m, mk_resource_meter_pnt as pnt
 						  WHERE MR_YMD = #{date, jdbcType=VARCHAR}
 						  AND MR_HHMI != '0000'
 						  and m.meter_id = pnt.meter_id 
 						  and pnt.METER_TYPE = #{type, jdbcType=VARCHAR}
-						  and pnt.resource_id = #{resource_id, jdbcType=VARCHAR} ) AS md, 
+						  and pnt.RESOURCE_ID = #{RESOURCE_ID, jdbcType=VARCHAR} ) AS md, 
 						( SELECT tou_time,VT2_MS_PRICE FROM mk_tou_price WHERE tou_time NOT LIKE '22%'
 						  UNION ALL
 						  SELECT '22:00 ~ 23:55',VT2_MS_PRICE FROM mk_tou_price WHERE tou_time LIKE '22%'
@@ -50,16 +49,56 @@
 							   BETWEEN DATE_ADD(STR_TO_DATE(CONCAT(md.MR_YMD, SUBSTR(p.tou_time,1,5),':', '00'),'%Y%m%d %H:%i:%s'),INTERVAL 1 MINUTE) 
 							   AND STR_TO_DATE(CONCAT(md.MR_YMD, SUBSTR(p.tou_time,9,5), ':', '00'),'%Y%m%d %H:%i:%s')
 					UNION all
-					SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.resource_id
-					FROM ( SELECT m.*, pnt.resource_id FROM meter_data m, mk_resource_meter_pnt as pnt 
+					SELECT md.ACT_PWR_QTY, p.VT2_MS_PRICE, md.RESOURCE_ID
+					FROM ( SELECT m.*, pnt.RESOURCE_ID FROM meter_data m, mk_resource_meter_pnt as pnt 
 						   WHERE MR_YMD = date_add(STR_TO_DATE(#{date, jdbcType=VARCHAR},'%Y%m%d'),INTERVAL 1 DAY) 
 						   AND MR_HHMI = '0000'
 						   and m.meter_id = pnt.meter_id 
 						   and pnt.METER_TYPE = #{type, jdbcType=VARCHAR}
-						   and pnt.resource_id = #{resource_id, jdbcType=VARCHAR}) AS md, 
+						   and pnt.RESOURCE_ID = #{RESOURCE_ID, jdbcType=VARCHAR}) AS md, 
 						 ( SELECT '00:00 ~ 04:00',VT2_MS_PRICE 
 						   FROM mk_tou_price 
 						   WHERE tou_time LIKE '22%') AS p ) x;
-   </insert>
- </mapper>
-   
+	</insert>
+	<insert id="insertPsoScheduleResource" parameterType="com.MybatisTest.vo.PsoScheduleResourceVo">
+		INSERT INTO pso_schedule_resource
+		VALUES
+		(
+			#{scheduleId},
+			#{psoResourceId},
+			#{typeName},
+			#{iedName},
+			#{equipmentName},
+			#{description},
+			#{startTime},
+			#{endTime},
+			#{applyTime}
+		)
+	</insert>
+	
+<!-- 	<update id="updatePsoScheduleResource" parameterType="com.kepco.epcm.model.db.pso.PsoScheduleResource"> -->
+<!-- 		UPDATE pso_schedule_resource SET -->
+<!-- 			SCHEDULE_ID=#{scheduleId},  -->
+<!-- 			PSO_RESOURCE_ID=#{psoResourceId},  -->
+<!-- 			TYPE_NAME=#{typeName},  -->
+<!-- 			IED_NAME=#{iedName},  -->
+<!-- 			EQUIPMENT_NAME=#{equipmentName}, -->
+<!-- 			DESCRIPTION=#{description},  -->
+<!-- 			START_TIME=#{startTime},  -->
+<!-- 			END_TIME=#{endTime},  -->
+<!-- 			APPLY_TIME=#{applyTime},  -->
+<!-- 		WHERE  -->
+<!-- 			SCHEDULE_ID=#{scheduleId} -->
+<!-- 	</update> -->
+<!-- 	<delete id="deletePsoScheduleResource" parameterType="com.kepco.epcm.model.db.pso.PsoScheduleResource"> -->
+<!-- 		DELETE FROM pso_schedule_resource WHERE -->
+<!-- 			SCHEDULE_ID=#{scheduleId} -->
+<!-- 	</delete> -->
+	<insert id="insertMultipyPsoQuality" parameterType="java.util.HashMap">
+		INSERT INTO PSO_QUALITY(TR, VALUE, TYPE,APPLY_DATE) VALUES
+			 <foreach collection="qualityList" item="item" separator=" , ">
+			 	 (#{item.TR}, #{item.VALUE}, #{item.TYPE}, #{item.APPLY_DATE})
+			 </foreach>
+
+	</insert>
+</mapper>
